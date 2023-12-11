@@ -1,0 +1,111 @@
+/* Global styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6f8;
+}
+
+.App {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #007aff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    button:hover {
+        background-color: #005ec7;
+    }
+
+input {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100%;
+}
+
+/* Navbar styles */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 50px;
+    background-color: #333;
+    color: #fff;
+}
+
+    nav h2 {
+        cursor: 'pointer';
+        color: #fff;
+    }
+
+    nav div {
+        display: flex;
+        gap: 20px;
+    }
+
+    nav a {
+        color: #fff;
+        text-decoration: none;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+        nav a:hover {
+            color: #007aff;
+        }
+
+    /* Spacing adjustments */
+    nav + div, h2 {
+        margin-top: 40px;
+    }
+
+pre {
+    text-align: left;
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    max-width: 100%;
+    margin: 20px auto;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+        nav h2, nav div {
+            margin: 10px 0;
+        }
+
+        nav div {
+            gap: 10px;
+        }
+
+    input {
+        width: 100%;
+    }
+}
