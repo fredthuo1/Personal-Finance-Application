@@ -6,7 +6,6 @@ const SignUp = () => {
         name: '',
         email: '',
         password: '',
-        rippleAddress: ''
     });
 
     const handleChange = (e) => {
@@ -33,7 +32,6 @@ const SignUp = () => {
                 <input type="text" name="name" placeholder="Name" onChange={handleChange} required />
                 <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
                 <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
-                <input type="text" name="rippleAddress" placeholder="Ripple Address" onChange={handleChange} required />
                 <button type="submit">Signup</button>
             </form>
         </div>
