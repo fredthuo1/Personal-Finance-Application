@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function UploadData() {
-    const [file, setFile] = useState();
-    const [array, setArray] = useState([]);
+    const [file, setFile] = useState(null);
+    const [transactions, setTransactions] = useState([]);
+    const [groupedTransactions, setGroupedTransactions] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
 
     const fileReader = new FileReader();
 
@@ -10,20 +12,96 @@ function UploadData() {
         setFile(e.target.files[0]);
     };
 
-    const csvFileToArray = string => {
+    const csvFileToArray = (string) => {
         const csvHeader = string.slice(0, string.indexOf("\n")).split(",");
         const csvRows = string.slice(string.indexOf("\n") + 1).split("\n");
 
-        const array = csvRows.map(i => {
+        const data = csvRows.map((i) => {
             const values = i.split(",");
-            const obj = csvHeader.reduce((object, header, index) => {
+            return csvHeader.reduce((object, header, index) => {
                 object[header] = values[index];
                 return object;
             }, {});
-            return obj;
         });
 
-        setArray(array);
+        setTransactions(data);
+    };
+
+    const groupByMonthAndCategory = (transactions) => {
+        const groupedByMonth = {};
+
+        transactions.forEach(transaction => {
+            const date = new Date(transaction.Date);
+            const month = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+            const category = transaction.Category || 'Other';
+
+            if (!groupedByMonth[month]) {
+                groupedByMonth[month] = {};
+            }
+            if (!groupedByMonth[month][category]) {
+                groupedByMonth[month][category] = [];
+            }
+
+            groupedByMonth[month][category].push(transaction);
+        });
+
+        return groupedByMonth;
+    };
+
+    useEffect(() => {
+        if (transactions.length > 0) {
+            setIsLoading(true);
+            const grouped = groupByMonthAndCategory(transactions);
+            setGroupedTransactions(grouped);
+            setIsLoading(false);
+        }
+    }, [transactions]);
+
+    const renderGroupedTransactions = (grouped) => {
+        return Object.entries(grouped).map(([month, categories]) => (
+            <div key={month}>
+                <h2>{month}</h2>
+                {Object.entries(categories).map(([category, transactions]) => {
+                    const totalAmount = transactions.reduce((total, transaction) => (
+                        total + parseFloat(transaction.Amount || 0)
+                    ), 0);
+
+                    return (
+                        <div key={category}>
+                            <h3>{category}</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                        <th>Transaction Type</th>
+                                        <th>Category</th>
+                                        <th>Account Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {transactions.map((transaction, index) => (
+                                        <tr key={index}>
+                                            <td>{transaction.Date}</td>
+                                            <td>{transaction.Description}</td>
+                                            <td>${transaction.Amount}</td>
+                                            <td>{transaction['Transaction Type']}</td>
+                                            <td>{transaction.Category}</td>
+                                            <td>{transaction['Account Name']}</td>
+                                        </tr>
+                                    ))}
+                                    <tr>
+                                        <td colSpan="5" style={{ textAlign: 'right' }}>Total:</td>
+                                        <td>${totalAmount.toFixed(2)}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    );
+                })}
+            </div>
+        ));
     };
 
     const handleOnSubmit = (e) => {
@@ -39,49 +117,26 @@ function UploadData() {
         }
     };
 
-    const headerKeys = Object.keys(Object.assign({}, ...array));
-
     return (
         <div style={{ textAlign: "center" }}>
-            <h1>REACTJS CSV IMPORT EXAMPLE </h1>
+            <h1>REACTJS CSV IMPORT EXAMPLE</h1>
             <form>
                 <input
-                    type={"file"}
-                    id={"csvFileInput"}
-                    accept={".csv"}
+                    type="file"
+                    id="csvFileInput"
+                    accept=".csv"
                     onChange={handleOnChange}
                 />
-
-                <button
-                    onClick={(e) => {
-                        handleOnSubmit(e);
-                    }}
-                >
-                    IMPORT CSV
-        </button>
+                <button onClick={handleOnSubmit}>IMPORT CSV</button>
             </form>
 
             <br />
 
-            <table>
-                <thead>
-                    <tr key={"header"}>
-                        {headerKeys.map((key) => (
-                            <th key={key}>{key}</th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {array.map((item, index) => (
-                        <tr key={item.id || index}>
-                            {Object.values(item).map((val, valIndex) => (
-                                <td key={valIndex}>{val}</td>
-                            ))}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-
+            {isLoading ? (
+                <p>Loading...</p>
+            ) : (
+                    renderGroupedTransactions(groupedTransactions)
+                )}
         </div>
     );
 }
