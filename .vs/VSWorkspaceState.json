@@ -2,11 +2,15 @@
   "ExpandedNodes": [
     "",
     "\\client",
-    "\\client\\public",
     "\\client\\src",
     "\\client\\src\\components",
-    "\\client\\src\\pages"
+    "\\client\\src\\pages",
+    "\\server",
+    "\\server\\config",
+    "\\server\\controller",
+    "\\server\\middleware",
+    "\\server\\models"
   ],
-  "SelectedNode": "\\client\\src\\pages\\Login.js",
+  "SelectedNode": "\\server\\routes",
   "PreviewInSolutionExplorer": false
 }
