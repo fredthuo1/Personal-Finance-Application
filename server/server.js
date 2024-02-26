@@ -5,6 +5,8 @@ const transactionRoutes = require('./routes/transactionRoutes');
 const errorHandler = require('./middleware/errorMiddleware');
 const cors = require('cors');
 
+require('dotenv').config();
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -15,10 +17,19 @@ if (process.env.NODE_ENV === 'development') {
 connectDB();
 
 app.use(express.json());
-app.use(cors());  
-if (process.env.USE_HTTPS_ENFORCE) {
-    app.use(enforce.HTTPS({ trustProtoHeader: true }));
-}
+
+// Define CORS options
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true,            //access-control-allow-credentials:true
+    optionSuccessStatus: 200
+};
+
+// Enable CORS for all routes
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
 
 app.use('/api/users', userRoutes);
 app.use('/api/transactions', transactionRoutes);

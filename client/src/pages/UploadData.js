@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from '../components/AuthContext'; 
 
 function UploadData() {
     const [file, setFile] = useState(null);
@@ -7,6 +8,9 @@ function UploadData() {
     const [isLoading, setIsLoading] = useState(false);
 
     const fileReader = new FileReader();
+
+    const { userId } = useContext(AuthContext); 
+    console.log('UserId:', userId); // Add this line to log the userId
 
     const handleOnChange = (e) => {
         setFile(e.target.files[0]);
@@ -117,9 +121,34 @@ function UploadData() {
         }
     };
 
+    const handleSaveTransactions = async () => {
+        try {
+            console.log('Saving transactions...');
+            const response = await fetch('http://localhost:5000/api/transactions/saveTransactionsInBulk', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userID: userId, transactions }),
+            });
+
+            if (response.ok) {
+                console.log('Transactions saved successfully!');
+                alert('Transactions saved successfully!');
+            } else {
+                console.error('Failed to save transactions.');
+                alert('Failed to save transactions.');
+            }
+        } catch (error) {
+            console.error('Error saving transactions:', error);
+            alert('An error occurred while saving transactions.');
+        }
+    };
+
+
     return (
         <div style={{ textAlign: "center" }}>
-            <h1>REACTJS CSV IMPORT EXAMPLE</h1>
+            <h1>Hello {userId} </h1>
             <form>
                 <input
                     type="file"
@@ -129,6 +158,8 @@ function UploadData() {
                 />
                 <button onClick={handleOnSubmit}>IMPORT CSV</button>
             </form>
+
+            <button onClick={handleSaveTransactions}>SAVE TRANSACTIONS</button>
 
             <br />
 
