@@ -1,14 +1,25 @@
-// controllers/transactionController.js
-const Transaction = require('../models/TransactionModel');
-
 // Create a new transaction
 const createTransaction = async (req, res, next) => {
     try {
         // Parse request data and create a new transaction
-        const transactionData = req.body;
+        const transactionData = {
+            ...req.body,
+            UserID: req.body.userID || 'Default User'
+        };
         const newTransaction = new Transaction(transactionData);
         await newTransaction.save();
         res.status(201).json(newTransaction);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Retrieve transactions by user ID
+const getTransactionsByUser = async (req, res, next) => {
+    try {
+        const userId = req.params.userId;
+        const transactions = await Transaction.find({ UserID: userId });
+        res.status(200).json(transactions);
     } catch (error) {
         next(error);
     }
@@ -32,7 +43,10 @@ const getTransactionById = async (req, res, next) => {
 const updateTransactionById = async (req, res, next) => {
     try {
         const transactionId = req.params.id;
-        const updatedData = req.body;
+        const updatedData = {
+            ...req.body,
+            UserID: req.body.userID || 'Default User'
+        };
         const updatedTransaction = await Transaction.findByIdAndUpdate(
             transactionId,
             updatedData,
@@ -61,26 +75,28 @@ const deleteTransactionById = async (req, res, next) => {
     }
 };
 
-// Retrieve transactions by user ID
-const getTransactionsByUser = async (req, res, next) => {
-    try {
-        const userId = req.params.userId;
-        const transactions = await Transaction.find({ UserID: userId });
-        res.status(200).json(transactions);
-    } catch (error) {
-        next(error);
-    }
-};
-
 // Save transactions in bulk
 const saveTransactionsInBulk = async (req, res, next) => {
     try {
         const userID = req.body.userID;
-        const transactions = req.body.transactions.map(transaction => {
-            return { ...transaction, UserID: userID };
-        });
+        const transactions = req.body.transactions;
+        console.log('Received transactions:', transactions);
 
-        await Transaction.insertMany(transactions);
+        // Ensure all transactions have the required fields
+        const validTransactions = transactions.map(transaction => {
+            const userId = userID || 'Default User'; // Track the UserID
+            console.log(`Adding transaction for UserID: ${userId}`); // Log UserID for each transaction
+            return {
+                ...transaction,
+                UserID: userId,
+                AccountName: transaction.AccountName || 'Default Account',
+                TransactionType: transaction.TransactionType || 'Default Transaction Type',
+                Amount: transaction.Amount || 0
+            };
+        });
+        console.log('Valid transactions:', validTransactions);
+
+        await Transaction.insertMany(validTransactions);
         res.status(201).json({ message: 'Transactions saved successfully' });
     } catch (error) {
         next(error);
@@ -89,9 +105,9 @@ const saveTransactionsInBulk = async (req, res, next) => {
 
 module.exports = {
     createTransaction,
+    getTransactionsByUser,
     getTransactionById,
     updateTransactionById,
     deleteTransactionById,
-    getTransactionsByUser,
     saveTransactionsInBulk
 };

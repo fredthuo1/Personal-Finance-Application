@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
-import { Navigate } from 'react-router-dom';
-import { AuthContext } from './AuthContext'; 
+import { Route, Navigate } from 'react-router-dom';
+import { AuthContext } from './AuthContext';
 
-const ProtectedRoute = ({ component: Component, ...rest }) => {
-    const { user } = useContext(AuthContext);
+const ProtectedRoute = ({ element, ...rest }) => {
+    const { isAuthenticated } = useContext(AuthContext);
 
-    if (user) {
-        return <Component {...rest} />;
+    if (isAuthenticated) {
+        return <Route {...rest} element={element} />;
     } else {
         return <Navigate to="/login" />;
     }

@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');  // For hashing passwords
 const jwt = require('jsonwebtoken');
+const updateSecretKey = require('../utils/updateSecretKey');
 
 exports.registerUser = async (req, res) => {
     try {
@@ -43,7 +44,14 @@ exports.loginUser = async (req, res) => {
             }
         };
 
-        jwt.sign(payload, 'your_jwt_secret', { expiresIn: 3600 }, (err, token) => {
+        console.error(req.body);
+
+        updateSecretKey(req.body.newKey);
+
+        // Use JWT_SECRET from environment variable
+        const secretOrPrivateKey = process.env.JWT_SECRET;
+
+        jwt.sign(payload,  , { expiresIn: 3600 }, (err, token) => {
             if (err) throw err;
             res.json({ token });
         });
@@ -52,4 +60,5 @@ exports.loginUser = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
+
 
