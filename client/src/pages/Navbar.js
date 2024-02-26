@@ -16,7 +16,10 @@ const Navbar = () => {
                     </>
                 )}
                 {isAuthenticated && (
-                    <Link to="/upload-data" className="navbar-link">Upload Data</Link>
+                    <>
+                        <Link to="/upload-data" className="navbar-link">Upload Data</Link>
+                        <Link to="/transactions" className="navbar-link">Transactions</Link>
+                    </>
                 )}
             </div>
         </nav>
