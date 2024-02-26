@@ -44,14 +44,10 @@ exports.loginUser = async (req, res) => {
             }
         };
 
-        console.error(req.body);
-
-        updateSecretKey(req.body.newKey);
-
         // Use JWT_SECRET from environment variable
         const secretOrPrivateKey = process.env.JWT_SECRET;
 
-        jwt.sign(payload,  , { expiresIn: 3600 }, (err, token) => {
+        jwt.sign(payload, secretOrPrivateKey, { expiresIn: 3600 }, (err, token) => {
             if (err) throw err;
             res.json({ token });
         });
@@ -60,5 +56,6 @@ exports.loginUser = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
+
 
 

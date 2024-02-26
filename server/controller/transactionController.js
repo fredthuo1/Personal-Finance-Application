@@ -1,3 +1,5 @@
+const Transaction = require('../models/TransactionModel');
+
 // Create a new transaction
 const createTransaction = async (req, res, next) => {
     try {
@@ -103,11 +105,23 @@ const saveTransactionsInBulk = async (req, res, next) => {
     }
 };
 
+// Fetch all transactions
+const getAllTransactions = async (req, res, next) => {
+    try {
+        const transactions = await Transaction.find();
+        res.status(200).json(transactions);
+    } catch (error) {
+        console.error('Error fetching all transactions:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
 module.exports = {
     createTransaction,
     getTransactionsByUser,
     getTransactionById,
     updateTransactionById,
     deleteTransactionById,
-    saveTransactionsInBulk
+    saveTransactionsInBulk,
+    getAllTransactions
 };

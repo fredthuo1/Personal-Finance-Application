@@ -1,5 +1,5 @@
 const express = require('express');
-const { createTransaction, getTransactionById, updateTransactionById, deleteTransactionById, getTransactionsByUser, saveTransactionsInBulk } = require('../controller/transactionController');
+const { createTransaction, getTransactionById, updateTransactionById, deleteTransactionById, getTransactionsByUser, saveTransactionsInBulk, getAllTransactions } = require('../controller/transactionController');
 
 const router = express.Router();
 
@@ -11,9 +11,10 @@ router.put('/transaction/:transactionId', updateTransactionById);
 
 router.delete('/transaction/:transactionId', deleteTransactionById);
 
-router.get('/transaction/:userId', getTransactionsByUser);
+router.get('/transaction/:userId/transactions', getTransactionsByUser);
 
 router.post('/saveTransactionsInBulk', saveTransactionsInBulk);
 
-module.exports = router;
+router.get('/getAllTransactions', getAllTransactions);
 
+module.exports = router;
