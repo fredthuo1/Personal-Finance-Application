@@ -3,14 +3,14 @@
     "",
     "\\client",
     "\\client\\src",
-    "\\server",
+    "\\client\\src\\components",
+    "\\client\\src\\pages",
     "\\server\\config",
     "\\server\\controller",
     "\\server\\middleware",
     "\\server\\models",
-    "\\server\\routes",
-    "\\server\\utils"
+    "\\server\\routes"
   ],
-  "SelectedNode": "\\server\\.env",
+  "SelectedNode": "\\client\\src\\App.css",
   "PreviewInSolutionExplorer": false
 }
