@@ -4,12 +4,7 @@
     "\\client",
     "\\client\\src",
     "\\client\\src\\components",
-    "\\client\\src\\pages",
-    "\\server\\config",
-    "\\server\\controller",
-    "\\server\\middleware",
-    "\\server\\models",
-    "\\server\\routes"
+    "\\client\\src\\pages"
   ],
   "SelectedNode": "\\client\\src\\App.css",
   "PreviewInSolutionExplorer": false

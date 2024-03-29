@@ -16,20 +16,12 @@ if (process.env.NODE_ENV === 'development') {
 
 connectDB();
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Define CORS options
-const corsOptions = {
-    origin: 'http://localhost:3000',
-    credentials: true,            //access-control-allow-credentials:true
-    optionSuccessStatus: 200
-};
-
-// Enable CORS for all routes
-app.use(cors(corsOptions));
-
-// Handle preflight requests
-app.options('*', cors(corsOptions));
+app.use(cors({
+    origin: 'http://localhost:3000'
+}));
 
 app.use('/api/users', userRoutes);
 app.use('/api/transactions', transactionRoutes);

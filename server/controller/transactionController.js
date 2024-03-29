@@ -79,29 +79,35 @@ const deleteTransactionById = async (req, res, next) => {
 
 // Save transactions in bulk
 const saveTransactionsInBulk = async (req, res, next) => {
+    console.log('Request body Server Side');
+
     try {
         const userID = req.body.userID;
         const transactions = req.body.transactions;
-        console.log('Received transactions:', transactions);
 
-        // Ensure all transactions have the required fields
         const validTransactions = transactions.map(transaction => {
-            const userId = userID || 'Default User'; // Track the UserID
-            console.log(`Adding transaction for UserID: ${userId}`); // Log UserID for each transaction
+            const cleanedAmount = transaction.Amount.replace(/[^0-9.-]+/g, '').trim();
+            const amount = parseFloat(cleanedAmount);
+
+            if (isNaN(amount)) {
+                console.log(`Dropping transaction with invalid amount: ${transaction.Amount}`);
+                return null;
+            }
+
             return {
                 ...transaction,
-                UserID: userId,
-                AccountName: transaction.AccountName || 'Default Account',
-                TransactionType: transaction.TransactionType || 'Default Transaction Type',
-                Amount: transaction.Amount || 0
+                Amount: amount,
+                UserID: userID  
             };
-        });
-        console.log('Valid transactions:', validTransactions);
+        }).filter(transaction => transaction !== null);
+
+        console.log(validTransactions);
 
         await Transaction.insertMany(validTransactions);
         res.status(201).json({ message: 'Transactions saved successfully' });
     } catch (error) {
-        next(error);
+        console.error('Error saving transactions:', error);
+        res.status(500).json({ message: 'Error saving transactions' });
     }
 };
 

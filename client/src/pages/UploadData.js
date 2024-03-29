@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import { AuthContext } from '../components/AuthContext'; 
+import React, { useState, useEffect } from "react";
+import { Buffer } from 'buffer';
 
 function UploadData() {
     const [file, setFile] = useState(null);
@@ -9,8 +9,29 @@ function UploadData() {
 
     const fileReader = new FileReader();
 
-    const { userId } = useContext(AuthContext); 
-    console.log('UserId:', userId); // Add this line to log the userId
+
+    const decodeToken = (token) => {
+        console.log('Original Token:sdfsdfdsfs', token);
+        try {
+            console.log('Original Token:', token);
+            const payload = token.split('.')[1];
+            console.log('Encoded Payload:', payload);
+            const decodedPayload = atob(payload);
+            console.log('Decoded Payload:', decodedPayload);
+            const parsedPayload = JSON.parse(decodedPayload);
+            console.log('Parsed Payload:', parsedPayload);
+            return parsedPayload.user ? parsedPayload.user.id : null;
+        } catch (error) {
+            console.error('Error decoding token:', error);
+            return null;
+        }
+    };
+
+    const token = localStorage.getItem('token');
+    console.log('Token:', token);
+    const decodedToken = decodeToken(token);
+    const userId = decodedToken ? decodedToken : null;
+    console.log('UserId:', userId);
 
     const handleOnChange = (e) => {
         setFile(e.target.files[0]);
@@ -28,6 +49,7 @@ function UploadData() {
             }, {});
         });
 
+        console.log('Parsed CSV data:', data); 
         setTransactions(data);
     };
 
@@ -114,6 +136,7 @@ function UploadData() {
         if (file) {
             fileReader.onload = function (event) {
                 const text = event.target.result;
+                console.log('FileReader loaded:', text); 
                 csvFileToArray(text);
             };
 
@@ -123,14 +146,29 @@ function UploadData() {
 
     const handleSaveTransactions = async () => {
         try {
+            const requestBody = { userID: userId, transactions };
             console.log('Saving transactions...');
+            console.log('Request URL:', 'http://localhost:5000/api/transactions/saveTransactionsInBulk');
+            console.log('Request Method:', 'POST');
+            console.log('Request Headers:', { 'Content-Type': 'application/json' });
+
+            const body = JSON.stringify(requestBody);
+
+            console.log('Request Body:', body);
+
             const response = await fetch('http://localhost:5000/api/transactions/saveTransactionsInBulk', {
                 method: 'POST',
+                body: body,
                 headers: {
+                    'Access-Control-Allow-Origin': '*',
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ userID: userId, transactions }),
             });
+
+            console.log('Response Status:', response.status);
+            console.log('Response Status Text:', response.statusText);
+            const responseData = await response.json();
+            console.log('Response Body:', responseData);
 
             if (response.ok) {
                 console.log('Transactions saved successfully!');
@@ -144,7 +182,6 @@ function UploadData() {
             alert('An error occurred while saving transactions.');
         }
     };
-
 
     return (
         <div style={{ textAlign: "center" }}>
