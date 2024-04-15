@@ -1,4 +1,6 @@
 const Transaction = require('../models/TransactionModel');
+const TransactionAnalyzer = require('../utils/TransactionAnalyzer'); 
+const analyzer = new TransactionAnalyzer();
 
 // Create a new transaction
 const createTransaction = async (req, res, next) => {
@@ -122,6 +124,24 @@ const getAllTransactions = async (req, res, next) => {
     }
 };
 
+// Analyze and retrieve transactions by user ID
+const analyzeAndRetrieveTransactions = async (req, res, next) => {
+    try {
+        const userId = req.params.userId;
+        const transactions = await Transaction.find({ UserID: userId });
+
+        const analyzedTransactions = await Promise.all(transactions.map(async transaction => {
+            const analysisResult = await analyzer.analyzeTransaction(transaction);
+            return { ...transaction.toObject(), analysis: analysisResult };
+        }));
+
+        res.status(200).json(analyzedTransactions);
+    } catch (error) {
+        console.error('Error analyzing transactions:', error);
+        next(error);
+    }
+};
+
 module.exports = {
     createTransaction,
     getTransactionsByUser,
@@ -129,5 +149,6 @@ module.exports = {
     updateTransactionById,
     deleteTransactionById,
     saveTransactionsInBulk,
-    getAllTransactions
+    getAllTransactions,
+    analyzeAndRetrieveTransactions 
 };

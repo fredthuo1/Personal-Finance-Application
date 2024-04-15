@@ -45,7 +45,7 @@ exports.loginUser = async (req, res) => {
         };
 
         // Use JWT_SECRET from environment variable
-        const secretOrPrivateKey = process.env.JWT_SECRET;
+        const secretOrPrivateKey = "secret_key";
 
         jwt.sign(payload, secretOrPrivateKey, { expiresIn: 3600 }, (err, token) => {
             if (err) throw err;
