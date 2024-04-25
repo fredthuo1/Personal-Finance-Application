@@ -1,6 +1,6 @@
 const Transaction = require('../models/TransactionModel');
-const TransactionAnalyzer = require('../utils/TransactionAnalyzer'); 
-const analyzer = new TransactionAnalyzer();
+// const TransactionAnalyzer = require('../utils/TransactionAnalyzer'); 
+// const analyzer = new TransactionAnalyzer();
 
 // Create a new transaction
 const createTransaction = async (req, res, next) => {

@@ -2,15 +2,15 @@
   "ExpandedNodes": [
     "",
     "\\client",
+    "\\client\\src",
     "\\client\\src\\components",
     "\\client\\src\\pages",
     "\\server",
     "\\server\\controller",
     "\\server\\middleware",
     "\\server\\models",
-    "\\server\\routes",
-    "\\server\\utils"
+    "\\server\\routes"
   ],
-  "SelectedNode": "\\server\\package.json",
+  "SelectedNode": "\\server\\controller\\transactionController.js",
   "PreviewInSolutionExplorer": false
 }

@@ -7,6 +7,8 @@ import UploadData from './pages/UploadData';
 import Transactions from './pages/Transactions';
 import { AuthProvider } from './components/AuthContext';
 import './App.css';
+import MontlyTransactions from './pages/MontlyTransactions';
+import WeeklyTransactions from './pages/WeeklyTransactions';
 
 function App() {
     return (
@@ -18,7 +20,9 @@ function App() {
                         <Route path="/sign-up" element={<SignUp />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/upload-data" element={<UploadData />} />
-                        <Route path="/transactions" element={<Transactions />} />                       
+                        <Route path="/transactions" element={<Transactions />} />
+                        <Route path="/monthly-transactions" element={<MontlyTransactions />} />
+                        <Route path="/weekly-transactions" element={<WeeklyTransactions />} />                       
                     </Routes>
                 </div>
             </Router>
