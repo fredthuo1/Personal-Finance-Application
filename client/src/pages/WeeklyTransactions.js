@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import Chart from "chart.js/auto";
 
 function WeeklyTransactions() {
     const [transactions, setTransactions] = useState([]);
     const [selectedWeek, setSelectedWeek] = useState("");
     const [weekOptions, setWeekOptions] = useState([]);
+    const chartRef = useRef(null);
 
     useEffect(() => {
         const fetchTransactions = async () => {
@@ -24,8 +26,15 @@ function WeeklyTransactions() {
             const weeks = getUniqueWeeks(transactions);
             setWeekOptions(weeks);
             setSelectedWeek(weeks[0]); // Set the default selected week
+            renderChart(weeks[0]);
         }
     }, [transactions]);
+
+    useEffect(() => {
+        if (transactions.length > 0) {
+            renderChart(selectedWeek);
+        }
+    }, [selectedWeek]);
 
     const getUniqueWeeks = (transactions) => {
         const weeksSet = new Set();
@@ -43,55 +52,79 @@ function WeeklyTransactions() {
         return week;
     };
 
-    const renderTransactionsByCategory = () => {
-        // Filter transactions based on the selected week
+    const renderChart = (week) => {
+        const ctx = document.getElementById('weeklyTransactionsChart');
         const filteredTransactions = transactions.filter(transaction => {
             const date = new Date(transaction.Date);
-            const week = getWeekNumber(date);
-            return week === parseInt(selectedWeek);
+            const transactionWeek = getWeekNumber(date);
+            return transactionWeek === week;
+        });
+        const categories = [...new Set(filteredTransactions.map(transaction => transaction.Category))];
+        const categoryAmounts = categories.map(category => {
+            return filteredTransactions.reduce((total, transaction) => {
+                return transaction.Category === category ? total + parseFloat(transaction.Amount || 0) : total;
+            }, 0);
         });
 
-        // Create a map of category to transactions
-        const categorizedTransactions = {};
-        filteredTransactions.forEach(transaction => {
-            const category = transaction.Category || 'Other';
-            if (!categorizedTransactions[category]) {
-                categorizedTransactions[category] = [];
+        if (chartRef.current) {
+            chartRef.current.destroy();
+        }
+
+        chartRef.current = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: categories,
+                datasets: [{
+                    label: 'Amount',
+                    data: categoryAmounts,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
-            categorizedTransactions[category].push(transaction);
+        });
+    };
+
+    const handleWeekChange = (event) => {
+        setSelectedWeek(parseInt(event.target.value));
+    };
+
+    const renderTransactionsList = (week) => {
+        const filteredTransactions = transactions.filter(transaction => {
+            const date = new Date(transaction.Date);
+            const transactionWeek = getWeekNumber(date);
+            return transactionWeek === week;
         });
 
-        // Render transactions grouped by category
-        return Object.entries(categorizedTransactions).map(([category, transactions]) => (
-            <div key={category} className="category">
-                <h2>{category}</h2>
-                <ul className="transaction-list">
-                    {transactions.map((transaction, index) => (
-                        <li key={index} className="transaction">
-                            <span className="date">{transaction.Date}</span>
-                            <span className="description">{transaction.Description}</span>
-                            <span className="amount">${transaction.Amount}</span>
-                        </li>
+        return (
+            <div>
+                <h2>Transactions for Week {week}</h2>
+                <ul>
+                    {filteredTransactions.map((transaction, index) => (
+                        <li key={index}>{transaction.Description} - ${transaction.Amount}</li>
                     ))}
                 </ul>
             </div>
-        ));
-    };
-
-
-    const handleWeekChange = (event) => {
-        setSelectedWeek(event.target.value);
+        );
     };
 
     return (
         <div className="transactions-container">
-            <h1>All Transactions by Category</h1>
+            <h1>Weekly Transactions Chart</h1>
             <select value={selectedWeek} onChange={handleWeekChange}>
                 {weekOptions.map(week => (
                     <option key={week} value={week}>Week {week}</option>
                 ))}
             </select>
-            {renderTransactionsByCategory()}
+            <canvas id="weeklyTransactionsChart"></canvas>
+            {selectedWeek && renderTransactionsList(selectedWeek)}
         </div>
     );
 }

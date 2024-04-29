@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import Chart from "chart.js/auto";
 
 function MonthlyTransactions() {
     const [transactions, setTransactions] = useState([]);
-    const [selectedMonth, setSelectedMonth] = useState("");
+    const [selectedMonth, setSelectedMonth] = useState('');
+    const chartRef = useRef(null);
 
     useEffect(() => {
         const fetchTransactions = async () => {
@@ -18,64 +20,123 @@ function MonthlyTransactions() {
         fetchTransactions();
     }, []);
 
-    const handleMonthChange = (e) => {
-        setSelectedMonth(e.target.value);
+    useEffect(() => {
+        if (transactions.length > 0) {
+            renderChart();
+        }
+    }, [transactions, selectedMonth]); // Include selectedMonth in the dependency array
+
+    const renderChart = () => {
+        const ctx = document.getElementById('monthlyTransactionsChart');
+        const filteredTransactions = filterTransactionsByMonth(transactions, selectedMonth);
+        const categories = getUniqueCategories(filteredTransactions);
+        const categoryTotals = calculateCategoryTotals(filteredTransactions, categories);
+
+        if (chartRef.current) {
+            chartRef.current.destroy();
+        }
+
+        chartRef.current = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: categories,
+                datasets: [{
+                    label: 'Monthly Total',
+                    data: categoryTotals,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Total Amount ($)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Category'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Render transaction list
+        renderTransactionList(filteredTransactions);
     };
 
-    const renderTransactionsByCategory = () => {
-        // Filter transactions based on the selected month
-        const filteredTransactions = transactions.filter(transaction => {
+    const handleMonthChange = (event) => {
+        setSelectedMonth(event.target.value);
+    };
+
+    const filterTransactionsByMonth = (transactions, month) => {
+        if (!month) {
+            return transactions;
+        }
+        return transactions.filter(transaction => {
             const date = new Date(transaction.Date);
-            const month = date.getMonth() + 1; // Month is zero-based, so we add 1
-            return month === parseInt(selectedMonth);
+            return date.toLocaleString('default', { month: 'short', year: 'numeric' }) === month;
         });
+    };
 
-        // Create a map of category to transactions
-        const categorizedTransactions = {};
-        filteredTransactions.forEach(transaction => {
-            const category = transaction.Category || 'Other';
-            if (!categorizedTransactions[category]) {
-                categorizedTransactions[category] = [];
-            }
-            categorizedTransactions[category].push(transaction);
+    const getUniqueCategories = (transactions) => {
+        const categoriesSet = new Set();
+        transactions.forEach(transaction => {
+            categoriesSet.add(transaction.Category || 'Other');
         });
+        return Array.from(categoriesSet);
+    };
 
-        // Render transactions grouped by category
-        return Object.entries(categorizedTransactions).map(([category, transactions]) => (
-            <div key={category} className="category">
-                <h2>{category}</h2>
-                <ul className="transaction-list">
+    const calculateCategoryTotals = (transactions, categories) => {
+        const categoryTotals = categories.map(category => {
+            return transactions
+                .filter(transaction => transaction.Category === category)
+                .reduce((total, transaction) => total + parseFloat(transaction.Amount || 0), 0);
+        });
+        return categoryTotals;
+    };
+
+    const renderTransactionList = (transactions) => {
+        return (
+            <div className="transaction-list">
+                <h2>Transactions List</h2>
+                <ul>
                     {transactions.map((transaction, index) => (
-                        <li key={index} className="transaction">
-                            <span className="date">{transaction.Date}</span>
-                            <span className="description">{transaction.Description}</span>
-                            <span className="amount">${transaction.Amount}</span>
+                        <li key={index}>
+                            <span>{transaction.Date}</span>
+                            <span>{transaction.Description}</span>
+                            <span>${transaction.Amount}</span>
                         </li>
                     ))}
                 </ul>
             </div>
-        ));
+        );
     };
 
     return (
         <div className="transactions-container">
-            <h1>All Transactions by Category</h1>
-            <select onChange={handleMonthChange} value={selectedMonth}>
-                <option value="">Select Month</option>
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
+            <h1>Monthly Transactions Chart</h1>
+            <label htmlFor="monthSelect">Select a month:</label>
+            <select id="monthSelect" value={selectedMonth} onChange={handleMonthChange}>
+                <option value="">All Months</option>
+                {/* Add options for each unique month in transactions */}
+                {Array.from(new Set(transactions.map(transaction => {
+                    const date = new Date(transaction.Date);
+                    return date.toLocaleString('default', { month: 'short', year: 'numeric' });
+                }))).map(month => (
+                    <option key={month} value={month}>{month}</option>
+                ))}
             </select>
-            {renderTransactionsByCategory()}
+            <div className="chart-container">
+                <canvas id="monthlyTransactionsChart"></canvas>
+            </div>
+            {renderTransactionList(filterTransactionsByMonth(transactions, selectedMonth))}
         </div>
     );
 }

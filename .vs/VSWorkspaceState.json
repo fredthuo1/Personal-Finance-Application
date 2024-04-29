@@ -5,12 +5,12 @@
     "\\client\\src",
     "\\client\\src\\components",
     "\\client\\src\\pages",
-    "\\server",
     "\\server\\controller",
     "\\server\\middleware",
     "\\server\\models",
-    "\\server\\routes"
+    "\\server\\routes",
+    "\\server\\utils"
   ],
-  "SelectedNode": "\\server\\controller\\transactionController.js",
+  "SelectedNode": "\\client\\src\\pages\\MontlyTransactions.js",
   "PreviewInSolutionExplorer": false
 }
