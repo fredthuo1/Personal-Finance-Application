@@ -9,6 +9,7 @@ import { AuthProvider } from './components/AuthContext';
 import './App.css';
 import MontlyTransactions from './pages/MontlyTransactions';
 import WeeklyTransactions from './pages/WeeklyTransactions';
+import TransactionAnalysis from './components/TransactionAnalysis';
 
 function App() {
     return (
@@ -22,7 +23,8 @@ function App() {
                         <Route path="/upload-data" element={<UploadData />} />
                         <Route path="/transactions" element={<Transactions />} />
                         <Route path="/monthly-transactions" element={<MontlyTransactions />} />
-                        <Route path="/weekly-transactions" element={<WeeklyTransactions />} />                       
+                        <Route path="/weekly-transactions" element={<WeeklyTransactions />} />
+                        <Route path="/analysis" element={<TransactionAnalysis />} />            
                     </Routes>
                 </div>
             </Router>

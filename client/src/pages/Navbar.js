@@ -21,6 +21,7 @@ const Navbar = () => {
                         <Link to="/transactions" className="navbar-link">Transactions</Link>
                         <Link to="/monthly-transactions" className="navbar-link">Monthly Transactions</Link>
                         <Link to="/weekly-transactions" className="navbar-link">Weekly Transactions</Link>
+                        <Link to="/analysis" className="navbar-link">Analysis</Link>
                     </>
                 )}
             </div>
