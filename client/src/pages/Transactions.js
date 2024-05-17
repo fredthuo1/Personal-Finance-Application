@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useAuth } from '../components/AuthContext';
 
 function Transactions() {
     const [transactions, setTransactions] = useState([]);
+    const { userId } = useAuth();
 
     useEffect(() => {
         const fetchTransactions = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/transactions/getAllTransactions`);
+                const response = await fetch(`http://localhost:5000/api/transactions/transaction/${userId}/transactions`);
                 const data = await response.json();
                 setTransactions(data);
             } catch (error) {
@@ -14,13 +16,14 @@ function Transactions() {
             }
         };
 
-        fetchTransactions();
-    }, []);
+        if (userId) {
+            fetchTransactions();
+        }
+    }, [userId]);
 
     const renderTransactionsByCategory = () => {
         const categorizedTransactions = {};
 
-        // Check if transactions array is defined
         if (!Array.isArray(transactions)) {
             return <p>No transactions found.</p>;
         }

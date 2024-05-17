@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
-const TransactionAnalysis = ({ transactions }) => {
+const TransactionAnalysis = ({ transactions = [] }) => {
     const [analysis, setAnalysis] = useState("");
-    const [period, setPeriod] = useState('monthly'); // Default to monthly
+    const [period, setPeriod] = useState('monthly');
 
     const generateAnalysisPrompt = (transactions, period) => {
         if (transactions.length === 0) {
@@ -57,6 +59,16 @@ const TransactionAnalysis = ({ transactions }) => {
         setPeriod(event.target.value);
     };
 
+    const generatePDFReport = () => {
+        const doc = new jsPDF();
+        doc.text("Transaction Report", 14, 16);
+        autoTable(doc, {
+            head: [['Date', 'Category', 'Amount']],
+            body: transactions.map(t => [t.Date, t.Category, t.Amount]),
+        });
+        doc.save('report.pdf');
+    };
+
     return (
         <div>
             <select value={period} onChange={handlePeriodChange}>
@@ -64,7 +76,20 @@ const TransactionAnalysis = ({ transactions }) => {
                 <option value="weekly">Weekly</option>
             </select>
             <button onClick={handleAnalyzeClick}>Analyze Transactions</button>
+            <button onClick={generatePDFReport}>Generate Report</button>
             <div>{analysis}</div>
+            <div>
+                <h2>Transactions List</h2>
+                <ul>
+                    {transactions.map((transaction, index) => (
+                        <li key={index}>
+                            <span>{transaction.Date}</span>
+                            <span>{transaction.Description}</span>
+                            <span>${transaction.Amount}</span>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     );
 };

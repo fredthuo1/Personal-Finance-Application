@@ -1,41 +1,31 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useNavigate  } from 'react-router-dom';
-import { AuthContext } from '../components/AuthContext';
+import { useAuth } from '../components/AuthContext';
 
 const Login = () => {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
-    const [errorMessage, setErrorMessage] = useState(null); 
-
-    const { login } = useContext(AuthContext); 
+    const [formData, setFormData] = useState({ email: '', password: '' });
+    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
         });
-    }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:5000/api/users/login', formData);
-            localStorage.setItem('token', response.data.token);
-
-            if (login) {
-                login();
-            }
-
-            navigate('/'); 
-
+            login(response.data.token);
+            navigate('/');
         } catch (error) {
-            setErrorMessage(error.response.data.msg); 
+            setErrorMessage(error.response.data.msg);
         }
-    }
+    };
 
     return (
         <div>
@@ -48,6 +38,6 @@ const Login = () => {
             </form>
         </div>
     );
-}
+};
 
 export default Login;

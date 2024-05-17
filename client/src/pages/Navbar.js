@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
 
 const Navbar = () => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, logout } = useAuth();
 
     return (
         <nav className="navbar">
@@ -22,6 +22,7 @@ const Navbar = () => {
                         <Link to="/monthly-transactions" className="navbar-link">Monthly Transactions</Link>
                         <Link to="/weekly-transactions" className="navbar-link">Weekly Transactions</Link>
                         <Link to="/analysis" className="navbar-link">Analysis</Link>
+                        <button onClick={logout} className="navbar-link">Logout</button>
                     </>
                 )}
             </div>

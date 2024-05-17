@@ -1,4 +1,5 @@
 const Transaction = require('../models/TransactionModel');
+const PDFDocument = require('pdfkit');
 // const TransactionAnalyzer = require('../utils/TransactionAnalyzer'); 
 // const analyzer = new TransactionAnalyzer();
 
@@ -18,13 +19,19 @@ const createTransaction = async (req, res, next) => {
     }
 };
 
-// Retrieve transactions by user ID
+// Retrieve transactions for the signed-in user
 const getTransactionsByUser = async (req, res, next) => {
     try {
-        const userId = req.params.userId;
+        // Get the user ID from the request object
+        const userId = req.params.userId; // Assuming the user ID is attached to req.userId
+
+        // Retrieve transactions belonging to the user
         const transactions = await Transaction.find({ UserID: userId });
+
+        // Return the transactions in the response
         res.status(200).json(transactions);
     } catch (error) {
+        // Pass any errors to the error handling middleware
         next(error);
     }
 };
@@ -88,8 +95,8 @@ const saveTransactionsInBulk = async (req, res, next) => {
         const transactions = req.body.transactions;
 
         const validTransactions = transactions.map(transaction => {
-            const cleanedAmount = transaction.Amount.replace(/[^0-9.-]+/g, '').trim();
-            const amount = parseFloat(cleanedAmount);
+            const amountString = transaction.Amount && typeof transaction.Amount === 'string' ? transaction.Amount.replace(/[^0-9.-]+/g, '').trim() : '0';
+            const amount = parseFloat(amountString);
 
             if (isNaN(amount)) {
                 console.log(`Dropping transaction with invalid amount: ${transaction.Amount}`);
@@ -99,7 +106,7 @@ const saveTransactionsInBulk = async (req, res, next) => {
             return {
                 ...transaction,
                 Amount: amount,
-                UserID: userID  
+                UserID: userID
             };
         }).filter(transaction => transaction !== null);
 
@@ -116,7 +123,8 @@ const saveTransactionsInBulk = async (req, res, next) => {
 // Fetch all transactions
 const getAllTransactions = async (req, res, next) => {
     try {
-        const transactions = await Transaction.find();
+        const userId = req.params.userId;
+        const transactions = await Transaction.find({ UserID: userId });
         res.status(200).json(transactions);
     } catch (error) {
         console.error('Error fetching all transactions:', error);
@@ -142,6 +150,41 @@ const analyzeAndRetrieveTransactions = async (req, res, next) => {
     }
 };
 
+// Generate a PDF report for a user's transactions
+const generateReport = async (req, res, next) => {
+    try {
+        const userId = req.params.userId;
+        const transactions = await Transaction.find({ UserID: userId });
+
+        // Create a new PDF document
+        const doc = new PDFDocument();
+        let filename = `Transaction_Report_${userId}.pdf`;
+        filename = encodeURIComponent(filename);
+
+        res.setHeader('Content-disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-type', 'application/pdf');
+
+        // Add content to the PDF
+        doc.fontSize(18).text('Transaction Report', { align: 'center' });
+        doc.moveDown();
+
+        transactions.forEach(transaction => {
+            doc.fontSize(12).text(`Date: ${transaction.Date}`);
+            doc.text(`Description: ${transaction.Description}`);
+            doc.text(`Amount: $${transaction.Amount}`);
+            doc.text(`Category: ${transaction.Category}`);
+            doc.moveDown();
+        });
+
+        // Finalize the PDF and end the stream
+        doc.pipe(res);
+        doc.end();
+    } catch (error) {
+        console.error('Error generating report:', error);
+        res.status(500).json({ message: 'Error generating report' });
+    }
+};
+
 module.exports = {
     createTransaction,
     getTransactionsByUser,
@@ -150,5 +193,6 @@ module.exports = {
     deleteTransactionById,
     saveTransactionsInBulk,
     getAllTransactions,
-    analyzeAndRetrieveTransactions 
+    analyzeAndRetrieveTransactions,
+    generateReport 
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useAuth } from '../components/AuthContext';
 import Chart from "chart.js/auto";
 
 function WeeklyTransactions() {
@@ -6,11 +7,12 @@ function WeeklyTransactions() {
     const [selectedWeek, setSelectedWeek] = useState("");
     const [weekOptions, setWeekOptions] = useState([]);
     const chartRef = useRef(null);
+    const { userId } = useAuth();
 
     useEffect(() => {
         const fetchTransactions = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/transactions/getAllTransactions`);
+                const response = await fetch(`http://localhost:5000/api/transactions/transaction/${userId}/transactions`);
                 const data = await response.json();
                 setTransactions(data);
             } catch (error) {
@@ -18,8 +20,10 @@ function WeeklyTransactions() {
             }
         };
 
-        fetchTransactions();
-    }, []);
+        if (userId) {
+            fetchTransactions();
+        }
+    }, [userId]);
 
     useEffect(() => {
         if (transactions.length > 0) {
