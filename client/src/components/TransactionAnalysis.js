@@ -20,7 +20,7 @@ const TransactionAnalysis = ({ transactions = [] }) => {
     };
 
     const analyzeTransactionsWithAI = async (prompt) => {
-        const openAIKey = process.env.REACT_APP_OPENAI_API_KEY; // Ensure your API key is stored securely
+        const openAIKey = process.env.REACT_APP_OPENAI_API_KEY; 
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
