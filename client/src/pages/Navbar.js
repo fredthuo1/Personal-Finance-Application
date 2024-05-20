@@ -7,8 +7,11 @@ const Navbar = () => {
 
     return (
         <nav className="navbar">
-            <h2 className="navbar-brand">Personal Finance Advisor</h2>
+            <Link to="/" className="navbar-link">
+                <h2 className="navbar-brand">Personal Finance Advisor</h2>
+            </Link>
             <div className="navbar-links">
+                <Link to="/about-us" className="navbar-link">About Us</Link>
                 {!isAuthenticated && (
                     <>
                         <Link to="/sign-up" className="navbar-link">Signup</Link>
@@ -17,10 +20,10 @@ const Navbar = () => {
                 )}
                 {isAuthenticated && (
                     <>
-                        <Link to="/upload-data" className="navbar-link">Upload Transaction Data</Link>
+                        <Link to="/upload-data" className="navbar-link">Upload</Link>
                         <Link to="/transactions" className="navbar-link">Transactions</Link>
-                        <Link to="/monthly-transactions" className="navbar-link">Monthly Transactions</Link>
-                        <Link to="/weekly-transactions" className="navbar-link">Weekly Transactions</Link>
+                        <Link to="/monthly-transactions" className="navbar-link">Monthly</Link>
+                        <Link to="/weekly-transactions" className="navbar-link">Weekly</Link>
                         <Link to="/analysis" className="navbar-link">Analysis</Link>
                         <button onClick={logout} className="navbar-link">Logout</button>
                     </>

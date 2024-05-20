@@ -4,8 +4,14 @@
     "\\client",
     "\\client\\src",
     "\\client\\src\\components",
-    "\\client\\src\\pages"
+    "\\client\\src\\pages",
+    "\\server",
+    "\\server\\config",
+    "\\server\\controller",
+    "\\server\\middleware",
+    "\\server\\routes",
+    "\\server\\utils"
   ],
-  "SelectedNode": "\\client\\src\\pages\\Navbar.js",
+  "SelectedNode": "\\client\\src\\pages\\MontlyTransactions.js",
   "PreviewInSolutionExplorer": false
 }

@@ -1,9 +1,10 @@
 /* Global styles */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f6f8;
+    background-color: #f7f9fc;
+    color: #333;
 }
 
 .App {
@@ -13,21 +14,23 @@ body {
 }
 
 h1, h2 {
-    color: #333;
+    color: #1e3a8a;
+    font-weight: 700;
 }
 
 button {
-    padding: 10px 15px;
-    background-color: #007aff;
+    padding: 10px 20px;
+    background-color: #1e40af;
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-weight: 600;
 }
 
     button:hover {
-        background-color: #005ec7;
+        background-color: #1d4ed8;
     }
 
 input {
@@ -36,6 +39,7 @@ input {
     border: 1px solid #ddd;
     border-radius: 5px;
     width: 100%;
+    box-sizing: border-box;
 }
 
 table {
@@ -43,8 +47,8 @@ table {
     border-collapse: collapse;
     margin: 20px 0;
     font-size: 0.9em;
-    min-width: 400px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
 }
 
 th, td {
@@ -54,39 +58,39 @@ th, td {
 }
 
 th {
-    background-color: #f3f3f3;
-    color: #333333;
+    background-color: #3b82f6;
+    color: #ffffff;
     font-weight: bold;
 }
 
 tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: #e0f2fe;
 }
 
 tbody tr:hover {
-    background-color: #f1f1f1;
+    background-color: #bae6fd;
     cursor: pointer;
 }
 
 thead tr {
-    background-color: #009879;
+    background-color: #2563eb;
     color: #ffffff;
-    text-align: center;
+    text-align: left;
 }
 
-/* Navbar styles */
 nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 50px;
-    background-color: #333;
+    background-color: #2563eb;
     color: #fff;
 }
 
     nav h2 {
-        cursor: 'pointer';
+        cursor: pointer;
         color: #fff;
+        margin: 0;
     }
 
     nav div {
@@ -99,71 +103,96 @@ nav {
         text-decoration: none;
         cursor: pointer;
         transition: color 0.3s;
+        font-weight: 600;
     }
 
         nav a:hover {
-            color: #007aff;
+            color: #93c5fd;
         }
 
-    /* Spacing adjustments */
-    nav + div, h2 {
-        margin-top: 40px;
-    }
-
-pre {
-    text-align: left;
-    background-color: #eee;
-    padding: 15px;
-    border-radius: 5px;
-    overflow-x: auto;
-    max-width: 100%;
-    margin: 20px auto;
-}
-
-.transactions-container {
+.home-container, .aboutus-container {
     max-width: 800px;
-    margin: 0 auto;
+    margin: 50px auto;
     padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.category {
-    margin-bottom: 20px;
+button.get-started-btn {
+    padding: 10px 15px;
+    background-color: #007aff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-h1, h2 {
-    color: #333;
-}
-
-.transaction-list {
-    list-style: none;
-    padding: 0;
-}
-
-.transaction {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
-}
-
-.date {
-    font-weight: bold;
-}
-
-.description {
-    flex: 1;
-    margin-left: 10px;
-}
-
-.amount {
-    font-weight: bold;
-}
+    button.get-started-btn:hover {
+        background-color: #005ec7;
+    }
 
 .error-message {
     color: red;
     font-size: 0.9rem;
     margin-bottom: 10px;
 }
+
+.transaction-list {
+    margin-top: 20px;
+}
+
+    .transaction-list ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .transaction-list li {
+        background-color: #fff;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .transaction-list span {
+        display: inline-block;
+        margin-right: 10px;
+        color: #1f2937;
+    }
+
+    .transaction-list .date {
+        color: #3b82f6;
+    }
+
+    .transaction-list .description {
+        color: #10b981;
+    }
+
+    .transaction-list .amount {
+        color: #ef4444;
+    }
+
+.educational-section {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #e0f7fa;
+    border-radius: 8px;
+    position: center;
+}
+
+    .educational-section h2 {
+        color: #00796b;
+        font-weight: 700;
+        position: center;
+    }
+
+    .educational-section p {
+        color: #004d40;
+        line-height: 1.6;
+        position: center;
+    }
 
 /* Responsive design */
 @media (max-width: 768px) {

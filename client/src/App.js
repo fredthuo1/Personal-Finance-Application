@@ -10,6 +10,8 @@ import './App.css';
 import MontlyTransactions from './pages/MontlyTransactions';
 import WeeklyTransactions from './pages/WeeklyTransactions';
 import TransactionAnalysis from './components/TransactionAnalysis';
+import Home from './pages/Home';
+import AboutUs from './pages/AboutUs';
 
 function App() {
     return (
@@ -18,6 +20,8 @@ function App() {
                 <div className="App">
                     <Navbar />
                     <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/about-us" element={<AboutUs />} />
                         <Route path="/sign-up" element={<SignUp />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/upload-data" element={<UploadData />} />
