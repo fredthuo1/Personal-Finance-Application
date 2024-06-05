@@ -1,16 +1,20 @@
 const Transaction = require('../models/TransactionModel');
+const classifyTransaction = require('../utils/classification');
 const PDFDocument = require('pdfkit');
-// const TransactionAnalyzer = require('../utils/TransactionAnalyzer'); 
-// const analyzer = new TransactionAnalyzer();
 
-// Create a new transaction
 const createTransaction = async (req, res, next) => {
     try {
-        // Parse request data and create a new transaction
+        const { Description, Category, ...rest } = req.body;
+        const enrichedCategory = classifyTransaction(Description, Category);
+
         const transactionData = {
-            ...req.body,
+            ...rest,
+            Description,
+            Category,
+            EnrichedCategory: enrichedCategory,
             UserID: req.body.userID || 'Default User'
         };
+
         const newTransaction = new Transaction(transactionData);
         await newTransaction.save();
         res.status(201).json(newTransaction);
@@ -19,45 +23,20 @@ const createTransaction = async (req, res, next) => {
     }
 };
 
-// Retrieve transactions for the signed-in user
-const getTransactionsByUser = async (req, res, next) => {
-    try {
-        // Get the user ID from the request object
-        const userId = req.params.userId; // Assuming the user ID is attached to req.userId
-
-        // Retrieve transactions belonging to the user
-        const transactions = await Transaction.find({ UserID: userId });
-
-        // Return the transactions in the response
-        res.status(200).json(transactions);
-    } catch (error) {
-        // Pass any errors to the error handling middleware
-        next(error);
-    }
-};
-
-// Retrieve a transaction by ID
-const getTransactionById = async (req, res, next) => {
-    try {
-        const transactionId = req.params.id;
-        const transaction = await Transaction.findById(transactionId);
-        if (!transaction) {
-            return res.status(404).json({ message: 'Transaction not found' });
-        }
-        res.status(200).json(transaction);
-    } catch (error) {
-        next(error);
-    }
-};
-
-// Update a transaction by ID
 const updateTransactionById = async (req, res, next) => {
     try {
         const transactionId = req.params.id;
+        const { Description, Category, ...rest } = req.body;
+        const enrichedCategory = classifyTransaction(Description, Category);
+
         const updatedData = {
-            ...req.body,
+            ...rest,
+            Description,
+            Category,
+            EnrichedCategory: enrichedCategory,
             UserID: req.body.userID || 'Default User'
         };
+
         const updatedTransaction = await Transaction.findByIdAndUpdate(
             transactionId,
             updatedData,
@@ -72,24 +51,7 @@ const updateTransactionById = async (req, res, next) => {
     }
 };
 
-// Delete a transaction by ID
-const deleteTransactionById = async (req, res, next) => {
-    try {
-        const transactionId = req.params.id;
-        const deletedTransaction = await Transaction.findByIdAndDelete(transactionId);
-        if (!deletedTransaction) {
-            return res.status(404).json({ message: 'Transaction not found' });
-        }
-        res.status(200).json({ message: 'Transaction deleted' });
-    } catch (error) {
-        next(error);
-    }
-};
-
-// Save transactions in bulk
 const saveTransactionsInBulk = async (req, res, next) => {
-    console.log('Request body Server Side');
-
     try {
         const userID = req.body.userID;
         const transactions = req.body.transactions;
@@ -103,14 +65,15 @@ const saveTransactionsInBulk = async (req, res, next) => {
                 return null;
             }
 
+            const enrichedCategory = classifyTransaction(transaction.Description, transaction.Category);
+
             return {
                 ...transaction,
                 Amount: amount,
-                UserID: userID
+                UserID: userID,
+                EnrichedCategory: enrichedCategory
             };
         }).filter(transaction => transaction !== null);
-
-        console.log(validTransactions);
 
         await Transaction.insertMany(validTransactions);
         res.status(201).json({ message: 'Transactions saved successfully' });
@@ -120,19 +83,53 @@ const saveTransactionsInBulk = async (req, res, next) => {
     }
 };
 
-// Fetch all transactions
-const getAllTransactions = async (req, res, next) => {
+const getTransactionsByUser = async (req, res, next) => {
     try {
-        const userId = req.params.userId;
+        const userId = req.params.userId; 
+
         const transactions = await Transaction.find({ UserID: userId });
+
         res.status(200).json(transactions);
     } catch (error) {
-        console.error('Error fetching all transactions:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        next(error);
     }
 };
 
-// Analyze and retrieve transactions by user ID
+const getTransactionById = async (req, res, next) => {
+    try {
+        const transactionId = req.params.id;
+        const transaction = await Transaction.findById(transactionId);
+        if (!transaction) {
+            return res.status(404).json({ message: 'Transaction not found' });
+        }
+        res.status(200).json(transaction);
+    } catch (error) {
+        next(error);
+    }
+};
+
+const deleteTransactionById = async (req, res, next) => {
+    try {
+        const transactionId = req.params.id;
+        const deletedTransaction = await Transaction.findByIdAndDelete(transactionId);
+        if (!deletedTransaction) {
+            return res.status(404).json({ message: 'Transaction not found' });
+        }
+        res.status(200).json({ message: 'Transaction deleted' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getAllTransactions = async (req, res) => {
+    try {
+        const transactions = await Transaction.find();
+        res.json({ transactions, analysis, prediction });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 const analyzeAndRetrieveTransactions = async (req, res, next) => {
     try {
         const userId = req.params.userId;
@@ -150,13 +147,11 @@ const analyzeAndRetrieveTransactions = async (req, res, next) => {
     }
 };
 
-// Generate a PDF report for a user's transactions
 const generateReport = async (req, res, next) => {
     try {
         const userId = req.params.userId;
         const transactions = await Transaction.find({ UserID: userId });
 
-        // Create a new PDF document
         const doc = new PDFDocument();
         let filename = `Transaction_Report_${userId}.pdf`;
         filename = encodeURIComponent(filename);
@@ -164,7 +159,6 @@ const generateReport = async (req, res, next) => {
         res.setHeader('Content-disposition', `attachment; filename="${filename}"`);
         res.setHeader('Content-type', 'application/pdf');
 
-        // Add content to the PDF
         doc.fontSize(18).text('Transaction Report', { align: 'center' });
         doc.moveDown();
 
@@ -176,14 +170,59 @@ const generateReport = async (req, res, next) => {
             doc.moveDown();
         });
 
-        // Finalize the PDF and end the stream
-        doc.pipe(res);
+         doc.pipe(res);
         doc.end();
     } catch (error) {
         console.error('Error generating report:', error);
         res.status(500).json({ message: 'Error generating report' });
     }
 };
+
+const getTransactionComparisonData = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        console.log(`Fetching transactions for user: ${userId}`);
+
+        const userTransactions = await Transaction.find({ UserID: userId });
+        console.log(`User transactions: ${JSON.stringify(userTransactions)}`);
+
+        if (!userTransactions.length) {
+            console.log('No transactions found for user');
+            return res.status(404).json({ error: 'User does not have transaction data' });
+        }
+
+        const allTransactions = await Transaction.find();
+        console.log(`All transactions: ${JSON.stringify(allTransactions)}`);
+
+        const categorizeTransactions = (transactions) => {
+            return transactions.reduce((acc, transaction) => {
+                const category = transaction.Category || 'Uncategorized';
+                if (!acc[category]) {
+                    acc[category] = { amount: 0, count: 0 };
+                }
+                acc[category].amount += transaction.Amount;
+                acc[category].count += 1;
+                return acc;
+            }, {});
+        };
+
+        const userCategories = categorizeTransactions(userTransactions);
+        const allCategories = categorizeTransactions(allTransactions);
+
+        const averageCategories = Object.keys(allCategories).reduce((acc, category) => {
+            acc[category] = {
+                averageAmount: allCategories[category].amount / allCategories[category].count,
+            };
+            return acc;
+        }, {});
+
+        res.status(200).json({ userCategories, averageCategories });
+    } catch (error) {
+        console.error('Error fetching transaction comparison data:', error);
+        res.status(500).json({ message: 'Error fetching transaction comparison data' });
+    }
+};
+
 
 module.exports = {
     createTransaction,
@@ -194,5 +233,6 @@ module.exports = {
     saveTransactionsInBulk,
     getAllTransactions,
     analyzeAndRetrieveTransactions,
-    generateReport 
+    generateReport,
+    getTransactionComparisonData
 };

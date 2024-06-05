@@ -1,7 +1,6 @@
 const openai = require('openai');
 openai.apiKey = process.env.OPENAI_API_KEY;
 
-// Analyze transactions and generate educational content
 const analyzeTransactionsAndGenerateContent = async (req, res, next) => {
     try {
         const userId = req.user._id;
@@ -32,5 +31,4 @@ const analyzeTransactionsAndGenerateContent = async (req, res, next) => {
 
 module.exports = {
     analyzeTransactionsAndGenerateContent,
-    // other exports
 };

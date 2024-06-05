@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Buffer } from 'buffer';
 
 function UploadData() {
     const [file, setFile] = useState(null);
@@ -114,7 +113,7 @@ function UploadData() {
                                             <td>${transaction.Amount}</td>
                                             <td>{transaction['Transaction Type']}</td>
                                             <td>{transaction.Category}</td>
-                                            <td>{transaction['Account Name']}</td>
+                                            <td>{transaction.Amount}</td>
                                         </tr>
                                     ))}
                                     <tr>

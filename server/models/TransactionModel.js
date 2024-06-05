@@ -22,6 +22,9 @@ const transactionSchema = mongoose.Schema({
     },
     AccountName: {
         type: String,
+    },
+    EnrichedCategory: {
+        type: String,
     }
 });
 

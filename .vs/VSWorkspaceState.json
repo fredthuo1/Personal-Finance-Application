@@ -8,10 +8,9 @@
     "\\server",
     "\\server\\config",
     "\\server\\controller",
-    "\\server\\middleware",
-    "\\server\\routes",
+    "\\server\\models",
     "\\server\\utils"
   ],
-  "SelectedNode": "\\client\\src\\pages\\MontlyTransactions.js",
+  "SelectedNode": "\\client\\src\\pages\\UploadData.js",
   "PreviewInSolutionExplorer": false
 }

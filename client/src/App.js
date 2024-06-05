@@ -12,6 +12,9 @@ import WeeklyTransactions from './pages/WeeklyTransactions';
 import TransactionAnalysis from './components/TransactionAnalysis';
 import Home from './pages/Home';
 import AboutUs from './pages/AboutUs';
+import TransactionAnalyzer from './pages/TransactionsAnalyzer';
+import FinancialBlog from './pages/FinancialBlog';
+import ComparisonDashboard from './pages/ComparisonDashboard';
 
 function App() {
     return (
@@ -28,7 +31,10 @@ function App() {
                         <Route path="/transactions" element={<Transactions />} />
                         <Route path="/monthly-transactions" element={<MontlyTransactions />} />
                         <Route path="/weekly-transactions" element={<WeeklyTransactions />} />
-                        <Route path="/analysis" element={<TransactionAnalysis />} />            
+                        <Route path="/analysis" element={<TransactionAnalysis />} />
+                        <Route path="/analyser" element={<TransactionAnalyzer />} />
+                        <Route path="/blog" element={<FinancialBlog />} />
+                        <Route path="/comp-dash" element={<ComparisonDashboard />} />            
                     </Routes>
                 </div>
             </Router>

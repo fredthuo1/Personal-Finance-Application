@@ -25,6 +25,8 @@ const Navbar = () => {
                         <Link to="/monthly-transactions" className="navbar-link">Monthly</Link>
                         <Link to="/weekly-transactions" className="navbar-link">Weekly</Link>
                         <Link to="/analysis" className="navbar-link">Analysis</Link>
+                        <Link to="/blog" className="navbar-link">Weekly Blog</Link>
+                        <Link to="/comp-dash" className="navbar-link">Comparison Dashboard</Link>
                         <button onClick={logout} className="navbar-link">Logout</button>
                     </>
                 )}
